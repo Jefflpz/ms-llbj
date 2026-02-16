@@ -12,7 +12,6 @@ import com.example.ms_llbj.domain.Role;
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     private Long id;
 
     @Column(name = "username", nullable = false, unique = true, length = 225)

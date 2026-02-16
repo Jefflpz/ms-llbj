@@ -1,6 +1,4 @@
 package com.example.ms_llbj.persistence.entity;
-import com.example.ms_llbj.ms_llbj.persistence.entity.SchoolClass;
-import com.example.ms_llbj.ms_llbj.persistence.entity.Teacher;
 import jakarta.persistence.*;
 import lombok.*;
 @Entity
