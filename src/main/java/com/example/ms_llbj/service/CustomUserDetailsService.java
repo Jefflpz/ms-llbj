@@ -1,7 +1,7 @@
 package com.example.ms_llbj.service;
 
-import com.example.ms_llbj.persistence.entity.UserEntity;
-import com.example.ms_llbj.repository.UserRepository;
+import com.example.ms_llbj.persistence.entity.Account;
+import com.example.ms_llbj.repository.AccountRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository repository;
+    private final AccountRepository repository;
 
-    public CustomUserDetailsService(UserRepository repository) {
+    public CustomUserDetailsService(AccountRepository repository) {
         this.repository = repository;
     }
 
@@ -20,13 +20,13 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
 
-        UserEntity user = repository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+        Account account = repository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Conta não encontrada"));
 
         return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPassword())
-                .roles(user.getRole())
+                .withUsername(account.getUsername())
+                .password(account.getPassword())
+                .roles(account.getRole().name())
                 .build();
     }
 }

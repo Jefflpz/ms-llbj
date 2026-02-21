@@ -14,18 +14,16 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/test/public").permitAll() // 👈 CORRETO
+                        .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form
-                        .defaultSuccessUrl("/test/private", true)
-                );
-
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable());
 
         return http.build();
     }
@@ -33,6 +31,20 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public org.springframework.web.servlet.config.annotation.WebMvcConfigurer corsConfigurer() {
+        return new org.springframework.web.servlet.config.annotation.WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(org.springframework.web.servlet.config.annotation.CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:5173")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
+            }
+        };
     }
 
 }
