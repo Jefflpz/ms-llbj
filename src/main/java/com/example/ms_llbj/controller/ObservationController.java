@@ -33,6 +33,11 @@ public class ObservationController {
         return service.findById(id);
     }
 
+    @GetMapping("/student/{studentId}")
+    public List<ObservationResponseDTO> findByStudentId(@PathVariable String studentId) {
+        return service.findByStudentId(studentId);
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {

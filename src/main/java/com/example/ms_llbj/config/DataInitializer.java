@@ -18,19 +18,19 @@ public class DataInitializer {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @PostConstruct
-    public void init() {
-
-        if (repository.findByUsername("admin").isEmpty()) {
-
-            UserEntity user = new UserEntity();
-            user.setUsername("admin");
-            user.setPassword(passwordEncoder.encode("123456"));
-            user.setRole("USER");
-
-            repository.save(user);
-
-            System.out.println("Usuário admin criado!");
-        }
-    }
+//    @PostConstruct
+//    public void init() {
+//
+//        if (repository.findByUsername("admin").isEmpty()) {
+//
+//            UserEntity user = new UserEntity();
+//            user.setUsername("admin");
+//            user.setPassword(passwordEncoder.encode("123456"));
+//            user.setRole("USER");
+//
+//            repository.save(user);
+//
+//            System.out.println("Usuário admin criado!");
+//        }
+//    }
 }

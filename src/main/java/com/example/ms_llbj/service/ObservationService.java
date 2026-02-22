@@ -51,6 +51,12 @@ public class ObservationService {
                 .orElseThrow(() -> new RuntimeException("Observação não encontrada"));
     }
 
+    public List<ObservationResponseDTO> findByStudentId(String studentId) {
+        return repository.findByStudentId(studentId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
     public void delete(Long id) {
         repository.deleteById(id);
     }

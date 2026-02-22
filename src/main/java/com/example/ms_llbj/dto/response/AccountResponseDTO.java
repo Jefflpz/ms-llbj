@@ -13,9 +13,19 @@ public class AccountResponseDTO {
     @Schema(example = "5")
     private Long id;
 
-    @Schema(example = "ana.silva")
+    @Schema(example = "aluno.silva")
     private String username;
 
     @Schema(example = "STUDENT")
     private Role role;
+
+
+    public AccountResponseDTO(Long id, String username, Role role) {
+        this.id = id;
+        this.username = username;
+        this.role = role;
+    }
+
+    public AccountResponseDTO() {
+    }
 }
