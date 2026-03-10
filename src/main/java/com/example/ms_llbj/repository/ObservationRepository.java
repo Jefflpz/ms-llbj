@@ -7,6 +7,5 @@ import java.util.List;
 
 public interface ObservationRepository extends JpaRepository<Observation, Long> {
 
-    List<Observation> findByStudentId(String studentId);
+    List<Observation> findByStudentsId(String studentId);
 }
-

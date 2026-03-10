@@ -6,6 +6,8 @@ import com.example.ms_llbj.persistence.entity.SchoolClass;
 import com.example.ms_llbj.persistence.entity.Student;
 import com.example.ms_llbj.repository.SchoolClassRepository;
 import com.example.ms_llbj.repository.StudentRepository;
+import com.example.ms_llbj.repository.AccountRepository;
+import com.example.ms_llbj.persistence.entity.Account;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,23 +19,35 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final SchoolClassRepository schoolClassRepository;
+    private final AccountRepository accountRepository;
 
     public StudentResponseDTO create(StudentRequestDTO dto) {
         SchoolClass schoolClass = schoolClassRepository.findById(dto.getClassId())
                 .orElseThrow(() -> new RuntimeException("Turma não encontrada"));
 
+        Account user = accountRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
         Student student = Student.builder()
                 .id(dto.getId())
                 .name(dto.getName())
                 .email(dto.getEmail())
+                .registration(dto.getRegistration())
                 .schoolClass(schoolClass)
                 .urlImage(dto.getUrlImage())
+                .account(user)
+                .status("Ativo")
                 .build();
 
         return toResponse(studentRepository.save(student));
     }
 
-    public List<StudentResponseDTO> findAll() {
+    public List<StudentResponseDTO> findAll(Long classId) {
+        if (classId != null) {
+            return studentRepository.findBySchoolClassId(classId).stream()
+                    .map(this::toResponse)
+                    .toList();
+        }
         return studentRepository.findAll().stream()
                 .map(this::toResponse)
                 .toList();
@@ -51,6 +65,7 @@ public class StudentService {
 
         student.setName(dto.getName());
         student.setEmail(dto.getEmail());
+        student.setRegistration(dto.getRegistration());
         student.setUrlImage(dto.getUrlImage());
 
         return toResponse(studentRepository.save(student));
@@ -65,7 +80,8 @@ public class StudentService {
         dto.setId(student.getId());
         dto.setName(student.getName());
         dto.setEmail(student.getEmail());
-        dto.setFirstAccess(student.getFirstAccess());
+        dto.setRegistration(student.getRegistration());
+        dto.setStatus(student.getStatus());
         dto.setClassId(student.getSchoolClass().getId());
         dto.setClassName(student.getSchoolClass().getName());
         dto.setUrlImage(student.getUrlImage());

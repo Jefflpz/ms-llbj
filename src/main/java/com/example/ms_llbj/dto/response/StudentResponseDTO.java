@@ -18,8 +18,11 @@ public class StudentResponseDTO {
     @Schema(example = "ana.silva@email.com")
     private String email;
 
-    @Schema(example = "0")
-    private Short firstAccess;
+    @Schema(example = "MAT-202301")
+    private String registration;
+
+    @Schema(example = "Ativo")
+    private String status;
 
     @Schema(example = "1")
     private Long classId;

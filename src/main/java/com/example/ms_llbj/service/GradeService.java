@@ -1,6 +1,5 @@
 package com.example.ms_llbj.service;
 
-import com.example.ms_llbj.domain.Quarter;
 import com.example.ms_llbj.dto.request.GradeRequestDTO;
 import com.example.ms_llbj.dto.response.GradeResponseDTO;
 import com.example.ms_llbj.persistence.entity.*;
@@ -8,85 +7,100 @@ import com.example.ms_llbj.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class GradeService {
 
-    private final GradeRepository repository;
-    private final StudentRepository studentRepository;
-    private final SubjectRepository subjectRepository;
+        private final GradeRepository repository;
+        private final StudentRepository studentRepository;
+        private final SubjectRepository subjectRepository;
 
-    public GradeResponseDTO create(GradeRequestDTO dto) {
+        public List<GradeResponseDTO> create(List<GradeRequestDTO> dtos) {
+                java.util.List<Grade> gradesToSave = new java.util.ArrayList<>();
 
-        Student student = studentRepository.findById(dto.getStudentId())
-                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+                for (GradeRequestDTO dto : dtos) {
+                        Grade grade = repository.findByStudentIdAndSubjectId(dto.getStudentId(), dto.getSubjectId())
+                                        .orElse(null);
 
-        Subject subject = subjectRepository.findById(dto.getSubjectId())
-                .orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
+                        if (grade == null) {
+                                Student student = studentRepository.findById(dto.getStudentId())
+                                                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+                                Subject subject = subjectRepository.findById(dto.getSubjectId())
+                                                .orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
 
-        GradeId id = new GradeId(
-                student.getId(),
-                subject.getId(),
-                dto.getQuarter()
-        );
+                                grade = Grade.builder()
+                                                .student(student)
+                                                .subject(subject)
+                                                .build();
+                        }
 
-        Grade grade = Grade.builder()
-                .id(id)
-                .student(student)
-                .subject(subject)
-                .value(dto.getValue())
-                .build();
+                        grade.setN1(dto.getN1());
+                        grade.setN2(dto.getN2());
+                        grade.setN3(dto.getN3());
 
-        return toResponse(repository.save(grade));
-    }
+                        gradesToSave.add(grade);
+                }
 
-    public List<GradeResponseDTO> findAll() {
-        return repository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .toList();
-    }
+                return repository.saveAll(gradesToSave).stream()
+                                .map(this::toResponse)
+                                .toList();
+        }
 
-    public GradeResponseDTO findById(String studentId, Long subjectId, Quarter quarter) {
+        public List<GradeResponseDTO> findAll(Long subjectId) {
+                if (subjectId != null) {
+                        return repository.findBySubjectId(subjectId).stream()
+                                        .map(this::toResponse)
+                                        .toList();
+                }
+                return repository.findAll()
+                                .stream()
+                                .map(this::toResponse)
+                                .toList();
+        }
 
-        GradeId id = new GradeId(studentId, subjectId, quarter);
+        public GradeResponseDTO findById(String studentId, Long subjectId) {
+                return repository.findByStudentIdAndSubjectId(studentId, subjectId)
+                                .map(this::toResponse)
+                                .orElseThrow(() -> new RuntimeException("Nota não encontrada"));
+        }
 
-        return repository.findById(id)
-                .map(this::toResponse)
-                .orElseThrow(() -> new RuntimeException("Nota não encontrada"));
-    }
+        public GradeResponseDTO update(String studentId, Long subjectId, GradeRequestDTO dto) {
+                Grade grade = repository.findByStudentIdAndSubjectId(studentId, subjectId)
+                                .orElseThrow(() -> new RuntimeException("Nota não encontrada"));
 
-    public GradeResponseDTO update(String studentId, Long subjectId,
-                                   Quarter quarter,
-                                   GradeRequestDTO dto) {
+                grade.setN1(dto.getN1());
+                grade.setN2(dto.getN2());
+                grade.setN3(dto.getN3());
 
-        GradeId id = new GradeId(studentId, subjectId, quarter);
+                return toResponse(repository.save(grade));
+        }
 
-        Grade grade = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Nota não encontrada"));
+        public void delete(String studentId, Long subjectId) {
+                Grade grade = repository.findByStudentIdAndSubjectId(studentId, subjectId)
+                                .orElseThrow(() -> new RuntimeException("Nota não encontrada"));
+                repository.deleteById(grade.getId());
+        }
 
-        grade.setValue(dto.getValue());
+        private GradeResponseDTO toResponse(Grade grade) {
+                GradeResponseDTO dto = new GradeResponseDTO();
 
-        return toResponse(repository.save(grade));
-    }
+                dto.setId(grade.getId());
+                dto.setStudentId(grade.getStudent().getId());
+                dto.setSubjectId(grade.getSubject().getId());
+                dto.setSubjectName(grade.getSubject().getName());
+                dto.setN1(grade.getN1());
+                dto.setN2(grade.getN2());
+                dto.setN3(grade.getN3());
 
-    public void delete(String studentId, Long subjectId, Quarter quarter) {
-        GradeId id = new GradeId(studentId, subjectId, quarter);
-        repository.deleteById(id);
-    }
+                if (grade.getN1() != null && grade.getN2() != null && grade.getN3() != null) {
+                        BigDecimal sum = grade.getN1().add(grade.getN2()).add(grade.getN3());
+                        dto.setAverage(sum.divide(new BigDecimal("3"), 1, RoundingMode.HALF_UP));
+                }
 
-    private GradeResponseDTO toResponse(Grade grade) {
-
-        GradeResponseDTO dto = new GradeResponseDTO();
-
-        dto.setStudentId(grade.getId().getStudentId());
-        dto.setSubjectId(grade.getId().getSubjectId());
-        dto.setQuarter(grade.getId().getQuarter());
-        dto.setSubjectName(grade.getSubject().getName());
-        dto.setValue(grade.getValue());
-
-        return dto;
-    }
+                return dto;
+        }
 }

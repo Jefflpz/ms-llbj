@@ -24,8 +24,8 @@ public class StudentController {
     }
 
     @GetMapping
-    public List<StudentResponseDTO> findAll() {
-        return studentService.findAll();
+    public List<StudentResponseDTO> findAll(@RequestParam(required = false) Long classId) {
+        return studentService.findAll(classId);
     }
 
     @GetMapping("/{id}")
@@ -36,8 +36,7 @@ public class StudentController {
     @PutMapping("/{id}")
     public StudentResponseDTO update(
             @PathVariable String id,
-            @RequestBody @Valid StudentRequestDTO dto
-    ) {
+            @RequestBody @Valid StudentRequestDTO dto) {
         return studentService.update(id, dto);
     }
 

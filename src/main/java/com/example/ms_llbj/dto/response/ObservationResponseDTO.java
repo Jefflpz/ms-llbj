@@ -1,6 +1,5 @@
 package com.example.ms_llbj.dto.response;
 
-
 import com.example.ms_llbj.domain.ObservationType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -22,11 +21,8 @@ public class ObservationResponseDTO {
     @Schema(example = "2º Ano B")
     private String className;
 
-    @Schema(example = "STU123")
-    private String studentId;
-
-    @Schema(example = "Ana Silva")
-    private String studentName;
+    @Schema(example = "[\"STU123\", \"STU124\"]")
+    private java.util.List<String> studentIds;
 
     @Schema(example = "PROF2024")
     private String teacherRegistration;
@@ -41,6 +37,5 @@ public class ObservationResponseDTO {
     private ObservationType type;
 
     @Schema(example = "2025-02-09T14:30:00Z")
-    private OffsetDateTime date;
+    private OffsetDateTime createdAt;
 }
-

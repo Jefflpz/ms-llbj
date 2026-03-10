@@ -1,5 +1,6 @@
 package com.example.ms_llbj.service;
 
+import com.example.ms_llbj.dto.request.AccountRequestDTO;
 import com.example.ms_llbj.dto.response.AccountResponseDTO;
 import com.example.ms_llbj.persistence.entity.Account;
 import com.example.ms_llbj.persistence.entity.Student;
@@ -14,6 +15,19 @@ public class AuthService {
 
     private final AccountRepository accountRepository;
     private final StudentRepository studentRepository;
+
+    public AccountResponseDTO register(AccountRequestDTO dto) {
+        if (accountRepository.findByUsername(dto.getUsername()).isPresent()) {
+            throw new RuntimeException("Username já está em uso");
+        }
+        Account account = Account.builder()
+                .username(dto.getUsername())
+                .password(dto.getPassword())
+                .role(dto.getRole())
+                .build();
+        Account saved = accountRepository.save(account);
+        return new AccountResponseDTO(saved.getId(), saved.getUsername(), saved.getRole());
+    }
 
     public AccountResponseDTO login(String username, String password) {
         Account account = accountRepository.findByUsername(username)
@@ -40,8 +54,6 @@ public class AuthService {
         return new AccountResponseDTO(
                 account.getId(),
                 account.getUsername(),
-                account.getRole()
-        );
+                account.getRole());
     }
 }
-

@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-
 @Getter
 @Setter
 @Schema(description = "Objeto para criação/atualização de estudante")
@@ -30,8 +29,11 @@ public class StudentRequestDTO {
     @Schema(example = "https://imagem.com/aluno.png")
     private String urlImage;
 
-    @NotNull(message = "O ID da conta é obrigatório.")
-    @Schema(example = "5")
-    private Long accountId;
-}
+    @NotBlank(message = "A matrícula é obrigatória.")
+    @Schema(example = "MAT-202301")
+    private String registration;
 
+    @NotNull(message = "O ID do usuário é obrigatório.")
+    @Schema(example = "5")
+    private Long userId;
+}

@@ -24,8 +24,10 @@ public class SubjectController {
     }
 
     @GetMapping
-    public List<SubjectResponseDTO> findAll() {
-        return service.findAll();
+    public List<SubjectResponseDTO> findAll(
+            @RequestParam(required = false) Long classId,
+            @RequestParam(required = false) String teacherRegistration) {
+        return service.findAll(classId, teacherRegistration);
     }
 
     @GetMapping("/{id}")
@@ -35,7 +37,7 @@ public class SubjectController {
 
     @PutMapping("/{id}")
     public SubjectResponseDTO update(@PathVariable Long id,
-                                     @RequestBody @Valid SubjectRequestDTO dto) {
+            @RequestBody @Valid SubjectRequestDTO dto) {
         return service.update(id, dto);
     }
 
