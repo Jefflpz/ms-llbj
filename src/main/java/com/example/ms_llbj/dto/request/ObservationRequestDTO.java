@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-
 @Getter
 @Setter
 @Schema(description = "Objeto para criação de observação")
@@ -15,9 +14,9 @@ public class ObservationRequestDTO {
     @Schema(example = "2")
     private Long classId;
 
-    @NotBlank(message = "O ID do estudante é obrigatório.")
-    @Schema(example = "STU123")
-    private String studentId;
+    @NotEmpty(message = "A lista de estudantes não pode estar vazia.")
+    @Schema(example = "[\"STU123\", \"STU124\"]")
+    private java.util.List<String> studentIds;
 
     @NotBlank(message = "A matrícula do professor é obrigatória.")
     @Schema(example = "PROF2024")

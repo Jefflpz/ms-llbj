@@ -36,7 +36,13 @@ public class SubjectService {
         return toResponse(repository.save(subject));
     }
 
-    public List<SubjectResponseDTO> findAll() {
+    public List<SubjectResponseDTO> findAll(Long classId, String teacherRegistration) {
+        if (classId != null) {
+            return repository.findBySchoolClassId(classId).stream().map(this::toResponse).toList();
+        }
+        if (teacherRegistration != null) {
+            return repository.findByTeacherRegistration(teacherRegistration).stream().map(this::toResponse).toList();
+        }
         return repository.findAll().stream().map(this::toResponse).toList();
     }
 

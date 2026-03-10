@@ -22,15 +22,17 @@ public class ObservationService {
         SchoolClass schoolClass = classRepository.findById(dto.getClassId())
                 .orElseThrow(() -> new RuntimeException("Turma não encontrada"));
 
-        Student student = studentRepository.findById(dto.getStudentId())
-                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+        java.util.List<Student> students = studentRepository.findAllById(dto.getStudentIds());
+        if (students.isEmpty()) {
+            throw new RuntimeException("Nenhum aluno encontrado");
+        }
 
         Teacher teacher = teacherRepository.findById(dto.getTeacherRegistration())
                 .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
 
         Observation observation = Observation.builder()
                 .schoolClass(schoolClass)
-                .student(student)
+                .students(students)
                 .teacher(teacher)
                 .message(dto.getMessage())
                 .type(dto.getType())
@@ -52,7 +54,7 @@ public class ObservationService {
     }
 
     public List<ObservationResponseDTO> findByStudentId(String studentId) {
-        return repository.findByStudentId(studentId).stream()
+        return repository.findByStudentsId(studentId).stream()
                 .map(this::toResponse)
                 .toList();
     }
@@ -66,13 +68,14 @@ public class ObservationService {
         dto.setId(o.getId());
         dto.setClassId(o.getSchoolClass().getId());
         dto.setClassName(o.getSchoolClass().getName());
-        dto.setStudentId(o.getStudent().getId());
-        dto.setStudentName(o.getStudent().getName());
+        java.util.List<String> studentIds = o.getStudents().stream().map(Student::getId).toList();
+        dto.setStudentIds(studentIds);
+
         dto.setTeacherRegistration(o.getTeacher().getRegistration());
         dto.setTeacherName(o.getTeacher().getName());
         dto.setMessage(o.getMessage());
         dto.setType(o.getType());
-        dto.setDate(o.getDate());
+        dto.setCreatedAt(o.getCreatedAt());
         return dto;
     }
 }

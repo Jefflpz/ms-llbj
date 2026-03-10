@@ -25,6 +25,9 @@ public class TeacherService {
         Teacher teacher = Teacher.builder()
                 .registration(dto.getRegistration())
                 .name(dto.getName())
+                .email(dto.getEmail())
+                .subject(dto.getSubject())
+                .status(dto.getStatus() != null ? dto.getStatus() : "Ativo")
                 .urlImage(dto.getUrlImage())
                 .account(account)
                 .build();
@@ -47,6 +50,10 @@ public class TeacherService {
                 .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
 
         teacher.setName(dto.getName());
+        teacher.setEmail(dto.getEmail());
+        teacher.setSubject(dto.getSubject());
+        if (dto.getStatus() != null)
+            teacher.setStatus(dto.getStatus());
         teacher.setUrlImage(dto.getUrlImage());
 
         return toResponse(repository.save(teacher));
@@ -60,6 +67,9 @@ public class TeacherService {
         TeacherResponseDTO dto = new TeacherResponseDTO();
         dto.setRegistration(teacher.getRegistration());
         dto.setName(teacher.getName());
+        dto.setEmail(teacher.getEmail());
+        dto.setSubject(teacher.getSubject());
+        dto.setStatus(teacher.getStatus());
         dto.setUrlImage(teacher.getUrlImage());
         return dto;
     }
